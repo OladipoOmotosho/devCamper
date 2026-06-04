@@ -3,6 +3,7 @@ const express = require("express");
 const morgan = require("morgan");
 const connectDB = require("./config/db");
 const colors = require("colors");
+const errorHandler = require("./middleware/error");
 
 //Connect to database
 
@@ -25,6 +26,8 @@ if (process.env.NODE_ENV === "developement") {
 }
 //Mount routers
 app.use("/api/v1/bootcamps", bootcamps);
+
+app.use(errorHandler);
 
 const PORT = getEnv("PORT", 5000);
 
