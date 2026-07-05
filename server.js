@@ -6,8 +6,7 @@ const colors = require("colors");
 const errorHandler = require("./middleware/error");
 
 //Connect to database
-
-connectDB();
+let server;
 
 //Route Files
 const bootcamps = require("./routes/bootcamps");
@@ -30,20 +29,33 @@ app.use("/api/v1/bootcamps", bootcamps);
 app.use(errorHandler);
 
 const PORT = getEnv("PORT", 5000);
+const startServer = async () => {
+  try {
+    await connectDB();
 
-const server = app.listen(
-  PORT,
-  console.log(
-    `Server running in ${getEnv("NODE_ENV", "development")} mode on port ${PORT}`
-      .yellow.bold,
-  ),
-);
+    server = app.listen(PORT, () =>
+      console.log(
+        `Server running in ${getEnv("NODE_ENV", "development")} mode on port ${PORT}`
+          .yellow.bold,
+      ),
+    );
+  } catch (err) {
+    console.log(`Startup error: ${err.message}`.red.bold);
+    process.exit(1);
+  }
+};
+
+startServer();
 
 //Handle unhandled promise rejections
 process.on("unhandledRejection", (err, promise) => {
   console.log(`Error: ${err.message}`.red.bold);
 
   // Close server and exit process
+  if (server) {
+    server.close(() => process.exit(1));
+    return;
+  }
 
-  server.close(() => process.exit(1));
+  process.exit(1);
 });
