@@ -21,7 +21,7 @@ app.use(express.json());
 //Dev logging middleware
 // app.use(logger);
 
-if (process.env.NODE_ENV === "developement") {
+if (process.env.NODE_ENV === "development") {
   app.use(morgan("dev"));
 }
 //Mount routers
