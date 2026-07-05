@@ -7,7 +7,10 @@ const Bootcamp = require("./models/Bootcamp");
 const mongoose = require("mongoose");
 
 //Connect to DB
-mongoose.connect(getEnv("MONGO_URI", { required: true }));
+mongoose.connect(getEnv("MONGO_URI", { required: true })).catch((err) => {
+  console.error(`DB connection error: ${err.message}`.red);
+  process.exit(1);
+});
 
 //Read JSON FILES
 const bootcamps = JSON.parse(
@@ -37,12 +40,14 @@ const deleteData = async () => {
     process.exit();
   } catch (err) {
     console.log(err);
-    process.exit(1);
+  }
+
+  if (process.argv[2] === "-i") {
+    importData();
+  } else if (process.argv[2] === "-d") {
+    deleteData();
+  } else {
+    console.log("Please add a proper flag: -i (import) or -d (delete)".yellow);
+    process.exit();
   }
 };
-
-if (process.argv[2] === "-i") {
-  importData();
-} else if (process.argv[2] === "-d") {
-  deleteData();
-}
